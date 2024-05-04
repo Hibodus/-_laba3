@@ -1,0 +1,397 @@
+№1
+#include <stdio.h>
+#include <math.h>
+
+// Объявление функций, для которых нужно вывести таблицу значений
+double func1(double x);
+double func2(double x);
+double func3(double x);
+
+// Функция для печати таблицы значений функции
+void Print_Tab_F(double (*f)(double), double start, double end, double step) {
+    printf("x\t|\tf(x)\n");
+    printf("-----------------\n");
+    for (double x = start; x <= end; x += step) {
+        printf("%.2f\t|\t%.2f\n", x, f(x));
+    }
+}
+
+int main() {
+    // Массив указателей на функции
+    double (*functions[])(double) = {func1, func2, func3};
+    // Отрезок определения аргумента и шаг его изменения для каждой функции
+    double start[] = {-1.0, 0.0, 1.0};
+    double end[] = {1.0, 10.0, 2.0};
+    double step[] = {0.1, 1.0, 0.2};
+
+    // Печать таблицы значений для каждой функции
+    for (int i = 0; i < 3; i++) {
+        printf("Таблица значений для функции %d:\n", i + 1);
+        Print_Tab_F(functions[i], start[i], end[i], step[i]);
+        printf("\n");
+    }
+
+    return 0;
+}
+
+// Определения функций
+double func1(double x) {
+    return sin(x);
+}
+
+double func2(double x) {
+    return exp(x);
+}
+
+double func3(double x) {
+    return x * x;
+}
+
+
+№2
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+void sieve_of_eratosthenes(int n) {
+    // Создаем массив для хранения информации о простых числах
+    bool *prime = (bool *)malloc((n + 1) * sizeof(bool));
+    // Инициализируем массив: все числа считаем простыми
+    for (int i = 2; i <= n; i++) {
+        prime[i] = true;
+    }
+
+    // Основной цикл алгоритма "Решето Эратосфена"
+    for (int p = 2; p * p <= n; p++) {
+        // Если число p осталось простым
+        if (prime[p] == true) {
+            // Вычеркиваем все кратные p, начиная с p^2
+            for (int i = p * p; i <= n; i += p) {
+                prime[i] = false;
+            }
+        }
+    }
+
+    // Выводим все простые числа до n
+    printf("Простые числа до %d:\n", n);
+    for (int p = 2; p <= n; p++) {
+        if (prime[p]) {
+            printf("%d ", p);
+        }
+    }
+    printf("\n");
+
+    // Освобождаем выделенную память
+    free(prime);
+}
+
+int main() {
+    int n;
+    printf("Введите верхнюю границу для поиска простых чисел: ");
+    scanf("%d", &n);
+
+    sieve_of_eratosthenes(n);
+
+    return 0;
+}
+
+
+№3
+#include <stdio.h>
+#include <math.h>
+
+// Структура для представления точки на плоскости
+struct Point {
+    int x;
+    int y;
+};
+
+// Функция для вычисления расстояния между двумя точками
+float distance(struct Point p1, struct Point p2) {
+    return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
+}
+
+// Функция для определения типа фигуры по четырем точкам
+void determine_figure(struct Point p1, struct Point p2, struct Point p3, struct Point p4) {
+    // Вычисляем длины всех сторон
+    float side1 = distance(p1, p2);
+    float side2 = distance(p2, p3);
+    float side3 = distance(p3, p4);
+    float side4 = distance(p4, p1);
+
+    // Проверяем длины сторон для определения типа фигуры
+    if (side1 == side2 && side2 == side3 && side3 == side4) {
+        printf("Квадрат\n");
+    } else if ((side1 == side3 && side2 == side4) || (side1 == side2 && side3 == side4)) {
+        printf("Прямоугольник\n");
+    } else if (side1 == side3 && side2 == side4) {
+        printf("Ромб\n");
+    } else if (side1 == side2 || side2 == side3 || side3 == side4 || side4 == side1) {
+        printf("Параллелограмм\n");
+    } else {
+        printf("Четырехугольник\n");
+    }
+}
+
+int main() {
+    struct Point p1, p2, p3, p4;
+
+    // Ввод координат четырех точек
+    printf("Введите координаты первой точки (x1 y1): ");
+    scanf("%d %d", &p1.x, &p1.y);
+    printf("Введите координаты второй точки (x2 y2): ");
+    scanf("%d %d", &p2.x, &p2.y);
+    printf("Введите координаты третьей точки (x3 y3): ");
+    scanf("%d %d", &p3.x, &p3.y);
+    printf("Введите координаты четвертой точки (x4 y4): ");
+    scanf("%d %d", &p4.x, &p4.y);
+
+    // Определение типа фигуры
+    determine_figure(p1, p2, p3, p4);
+
+    return 0;
+}
+
+
+№4
+#include <stdio.h>
+#include <stdbool.h>
+
+// Функция для определения, является ли билет "счастливым"
+bool is_lucky_ticket(int ticket) {
+    int num_digits = 0;
+    int sum_first_half = 0;
+    int sum_second_half = 0;
+    int divisor = 1;
+
+    // Определение количества цифр в номере билета
+    while (ticket / divisor != 0) {
+        num_digits++;
+        divisor *= 10;
+    }
+
+    // Определение суммы цифр первой половины номера билета
+    divisor = 1;
+    for (int i = 0; i < num_digits / 2; i++) {
+        sum_first_half += (ticket / divisor) % 10;
+        divisor *= 10;
+    }
+
+    // Определение суммы цифр второй половины номера билета
+    for (int i = 0; i < num_digits / 2; i++) {
+        sum_second_half += (ticket / divisor) % 10;
+        divisor *= 10;
+    }
+
+    // Проверка на равенство сумм цифр первой и второй половин номера билета
+    return sum_first_half == sum_second_half;
+}
+
+// Функция для подсчета числа "счастливых" билетов в рулоне
+int count_lucky_tickets(int m, int n) {
+    int count = 0;
+
+    // Проверка каждого билета в рулоне
+    for (int ticket = m; ticket < m + n; ticket++) {
+        if (is_lucky_ticket(ticket)) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+int main() {
+    int m, n;
+    printf("Введите номер первого билета: ");
+    scanf("%d", &m);
+    printf("Введите количество билетов: ");
+    scanf("%d", &n);
+
+    // Подсчет числа "счастливых" билетов
+    int num_lucky_tickets = count_lucky_tickets(m, n);
+    printf("Число счастливых билетов: %d\n", num_lucky_tickets);
+
+    return 0;
+}
+
+
+№5
+#include <stdio.h>
+
+// Функция для циклического сдвига массива вправо или влево на k позиций
+void Shift_R(int mas[], int n, int k, int s) {
+    if (s == 0) { // Сдвиг вправо
+        for (int i = 0; i < k; i++) {
+            int temp = mas[n - 1];
+            for (int j = n - 1; j > 0; j--) {
+                mas[j] = mas[j - 1];
+            }
+            mas[0] = temp;
+        }
+    } else if (s == 1) { // Сдвиг влево
+        for (int i = 0; i < k; i++) {
+            int temp = mas[0];
+            for (int j = 0; j < n - 1; j++) {
+                mas[j] = mas[j + 1];
+            }
+            mas[n - 1] = temp;
+        }
+    } else {
+        printf("Неверное значение переключателя s\n");
+    }
+}
+
+int main() {
+    int n, k, s;
+    printf("Введите размер массива: ");
+    scanf("%d", &n);
+    int mas[n];
+    printf("Введите элементы массива: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &mas[i]);
+    }
+    printf("Введите количество позиций сдвига: ");
+    scanf("%d", &k);
+    printf("Введите направление сдвига (0 - вправо, 1 - влево): ");
+    scanf("%d", &s);
+
+    // Вызов функции для сдвига массива
+    Shift_R(mas, n, k, s);
+
+    // Вывод сдвинутого массива
+    printf("Сдвинутый массив: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", mas[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+
+№6
+#include <stdio.h>
+
+void fill_spiral(int n, int spiral[][n], int start_row, int start_col, int direction) {
+    int num = 1;
+    int row_start = start_row, row_end = n - 1;
+    int col_start = start_col, col_end = n - 1;
+
+    while (row_start <= row_end && col_start <= col_end) {
+        // Заполняем верхнюю строку
+        for (int i = col_start; i <= col_end; i++) {
+            spiral[row_start][i] = num++;
+        }
+        row_start++;
+
+        // Заполняем правый столбец
+        for (int i = row_start; i <= row_end; i++) {
+            spiral[i][col_end] = num++;
+        }
+        col_end--;
+
+        // Заполняем нижнюю строку
+        if (row_start <= row_end) {
+            for (int i = col_end; i >= col_start; i--) {
+                spiral[row_end][i] = num++;
+            }
+            row_end--;
+        }
+
+        // Заполняем левый столбец
+        if (col_start <= col_end) {
+            for (int i = row_end; i >= row_start; i--) {
+                spiral[i][col_start] = num++;
+            }
+            col_start++;
+        }
+    }
+}
+
+void print_table(int n, int spiral[][n]) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%3d ", spiral[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int n;
+    printf("Введите размер квадратной таблицы: ");
+    scanf("%d", &n);
+    int spiral[n][n];
+
+    // Заполнение таблицы по спирали, начиная с угла (0, 0) и двигаясь против часовой стрелки
+    fill_spiral(n, spiral, 0, 0, 0);
+
+    // Вывод заполненной таблицы
+    printf("Заполненная таблица:\n");
+    print_table(n, spiral);
+
+    return 0;
+}
+#include <stdio.h>
+
+void fill_spiral(int n, int spiral[][n], int start_row, int start_col, int direction) {
+    int num = 1;
+    int row_start = start_row, row_end = n - 1;
+    int col_start = start_col, col_end = n - 1;
+
+    while (row_start <= row_end && col_start <= col_end) {
+        // Заполняем верхнюю строку
+        for (int i = col_start; i <= col_end; i++) {
+            spiral[row_start][i] = num++;
+        }
+        row_start++;
+
+        // Заполняем правый столбец
+        for (int i = row_start; i <= row_end; i++) {
+            spiral[i][col_end] = num++;
+        }
+        col_end--;
+
+        // Заполняем нижнюю строку
+        if (row_start <= row_end) {
+            for (int i = col_end; i >= col_start; i--) {
+                spiral[row_end][i] = num++;
+            }
+            row_end--;
+        }
+
+        // Заполняем левый столбец
+        if (col_start <= col_end) {
+            for (int i = row_end; i >= row_start; i--) {
+                spiral[i][col_start] = num++;
+            }
+            col_start++;
+        }
+    }
+}
+
+void print_table(int n, int spiral[][n]) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%3d ", spiral[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int n;
+    printf("Введите размер квадратной таблицы: ");
+    scanf("%d", &n);
+    int spiral[n][n];
+
+    // Заполнение таблицы по спирали, начиная с угла (0, 0) и двигаясь против часовой стрелки
+    fill_spiral(n, spiral, 0, 0, 0);
+
+    // Вывод заполненной таблицы
+    printf("Заполненная таблица:\n");
+    print_table(n, spiral);
+
+    return 0;
+}
